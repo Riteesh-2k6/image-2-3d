@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  inference-worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+    image: geoprior/inference-worker:latest
+    container_name: geoprior-worker
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:128
+      - TORCH_CUDA_ARCH_LIST=8.6
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    command: python benchmarks/run_b1_b2.py --views 120 --resolution 1280x720 --steps 1000

@@ -1,0 +1,32 @@
+# Python Virtual Environment & Bytecode
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.pytest_cache/
+.coverage
+htmlcov/
+
+# Large Drone Media & Raw Video Files (>50MB)
+videos/*.MP4
+videos/*.mp4
+videos/*.h264
+videos/*.avi
+videos/*.mov
+output/06_keyframes/
+output/*.mp4
+output/*.avi
+
+# OS & Editor Files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Scratch & Brain logs
+.scratch/
+scratch/

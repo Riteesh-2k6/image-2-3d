@@ -1,0 +1,81 @@
+{
+  "benchmark_metadata": {
+    "timestamp": "2026-08-29 20:12:14",
+    "configuration": {
+      "flight_duration_minutes": 10.0,
+      "fps_sampling_rate": 2.0,
+      "image_resolution": [
+        1280,
+        720
+      ],
+      "max_gaussians": 1200000,
+      "sh_degree": 1,
+      "num_iterations": 1000,
+      "preview_iteration": 500,
+      "use_8bit_adam": false,
+      "output_report": "reports/b1_b2_10min_flight.json",
+      "device": "cuda:0"
+    },
+    "environment": {
+      "python_version": "3.13.9",
+      "torch_version": "2.7.1+cu118",
+      "device_name": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+      "total_vram_mb": 6143.5
+    }
+  },
+  "b1_hardware_metrics": {
+    "peak_allocated_vram_mb": 351.84,
+    "peak_reserved_vram_mb": 1482.0,
+    "vram_utilization_pct": 24.12,
+    "fragmentation_ratio": 0.8308,
+    "host_ram_usage_mb": 481.1,
+    "cpu_utilization_pct": 10.6,
+    "final_gaussian_count": 1055358,
+    "gaussian_growth_curve": [
+      [
+        0,
+        300000,
+        105.43
+      ],
+      [
+        200,
+        396750,
+        130.95
+      ],
+      [
+        400,
+        524701,
+        168.58
+      ],
+      [
+        600,
+        693916,
+        215.2
+      ],
+      [
+        800,
+        917703,
+        277.01
+      ],
+      [
+        999,
+        1055358,
+        351.84
+      ]
+    ],
+    "oom_occurred": false
+  },
+  "b2_runtime_metrics": {
+    "total_optimization_runtime_seconds": 0.77,
+    "first_preview_latency_seconds": 0.29,
+    "step_latency_mean_ms": 0.7,
+    "step_latency_p50_ms": 0.07,
+    "step_latency_p95_ms": 0.93,
+    "step_latency_worst_ms": 38.72
+  },
+  "gate_g1_evaluation": {
+    "vram_target_met_le_5800mb": true,
+    "preview_target_met_le_30s": true,
+    "gate_g1_verdict": "PASS"
+  }
+}

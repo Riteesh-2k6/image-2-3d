@@ -1,0 +1,45 @@
+{
+  "benchmark_metadata": {
+    "timestamp": "2026-08-29 20:29:38",
+    "configuration": {
+      "flight_duration_minutes": 1.0,
+      "num_views": 20,
+      "image_resolution": [
+        256,
+        256
+      ],
+      "initial_gaussians": 10000,
+      "max_gaussians": 1200000,
+      "num_iterations": 100,
+      "densify_interval": 100,
+      "densify_grad_thresh": 0.0002,
+      "preview_iteration": 500,
+      "sh_degree": 1,
+      "output_report": "reports/b1_b2_real_test.json",
+      "device": "cuda:0"
+    },
+    "device": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+    "total_vram_mb": 6143.5
+  },
+  "b1_hardware_metrics": {
+    "peak_allocated_vram_mb": 3241.29,
+    "peak_reserved_vram_mb": 3264.0,
+    "vram_utilization_pct": 53.13,
+    "final_gaussian_count": 10000,
+    "oom_occurred": false
+  },
+  "b2_runtime_metrics": {
+    "total_optimization_runtime_seconds": 38.29,
+    "first_preview_latency_seconds": 0.0,
+    "step_latency_mean_ms": 359.31,
+    "step_latency_p50_ms": 356.47,
+    "step_latency_p95_ms": 359.5,
+    "step_latency_worst_ms": 627.41,
+    "final_photometric_loss": 0.4836
+  },
+  "gate_g1_evaluation": {
+    "vram_target_met_le_5800mb": true,
+    "preview_target_met_le_30s": false,
+    "gate_g1_verdict": "FAIL"
+  }
+}

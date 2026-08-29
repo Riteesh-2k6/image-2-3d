@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GeoPrior & SSAKS Interactive System Prototype</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --panel-bg: #161b22;
+      --panel-border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --accent-hover: #79c0ff;
+      --success: #3fb950;
+      --warning: #d29922;
+      --danger: #f85149;
+      --observed: #2ea043;
+      --prior-guided: #388bfd;
+      --ai-inferred: #d29922;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 20px;
+    }
+
+    header {
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--panel-border);
+      padding-bottom: 15px;
+    }
+    h1 { font-size: 1.6rem; color: var(--accent); margin-bottom: 6px; }
+    .subtitle { color: var(--text-muted); font-size: 0.95rem; }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: 340px 1fr 340px;
+      gap: 20px;
+      height: calc(100vh - 130px);
+      min-height: 650px;
+    }
+
+    .panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .panel h2 {
+      font-size: 1.1rem;
+      color: var(--text);
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--panel-border);
+      padding-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Tabs */
+    .tab-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--panel-border);
+      padding-bottom: 8px;
+    }
+    .tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+    .tab-btn.active {
+      background: #21262d;
+      border-color: var(--panel-border);
+      color: var(--accent);
+    }
+
+    /* Interactive Controls */
+    .control-group {
+      margin-bottom: 16px;
+    }
+    .control-group label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    select, input[type="range"], input[type="text"] {
+      width: 100%;
+      background: #0d1117;
+      border: 1px solid var(--panel-border);
+      color: var(--text);
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+    input[type="range"] { padding: 4px 0; }
+
+    .btn {
+      background: #21262d;
+      border: 1px solid var(--panel-border);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 500;
+      width: 100%;
+      margin-bottom: 8px;
+      transition: all 0.2s;
+    }
+    .btn:hover { background: #30363d; border-color: #8b949e; }
+    .btn-primary { background: #1f6feb; border-color: rgba(240,246,252,0.1); color: #fff; }
+    .btn-primary:hover { background: #388bfd; }
+    .btn-danger { background: #da3633; color: #fff; border: none; }
+    .btn-danger:hover { background: #f85149; }
+
+    /* Canvas / Viewport */
+    .viewport-container {
+      position: relative;
+      flex-grow: 1;
+      background: #090d13;
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Live Telemetry Badges */
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .badge-observed { background: rgba(46, 160, 67, 0.2); color: var(--observed); border: 1px solid var(--observed); }
+    .badge-prior { background: rgba(56, 139, 253, 0.2); color: var(--prior-guided); border: 1px solid var(--prior-guided); }
+    .badge-inferred { background: rgba(210, 153, 34, 0.2); color: var(--ai-inferred); border: 1px solid var(--ai-inferred); }
+    .badge-warning { background: rgba(248, 81, 73, 0.2); color: var(--danger); border: 1px solid var(--danger); }
+
+    /* Telemetry cards */
+    .stat-card {
+      background: #0d1117;
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
+    .stat-value { font-size: 1.2rem; font-weight: 600; color: var(--text); }
+    .stat-sub { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+
+    /* Scenario Walkthrough Step Box */
+    .scenario-box {
+      background: #1f242c;
+      border-left: 3px solid var(--accent);
+      padding: 12px;
+      border-radius: 0 6px 6px 0;
+      margin-bottom: 14px;
+      font-size: 0.85rem;
+    }
+
+    .log-box {
+      background: #090d13;
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      padding: 10px;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+      font-size: 0.78rem;
+      color: #7ee787;
+      height: 140px;
+      overflow-y: auto;
+      margin-top: auto;
+    }
+    .log-entry { margin-bottom: 4px; }
+    .log-warn { color: var(--warning); }
+    .log-err { color: var(--danger); }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🛸 GeoPrior & SSAKS Interactive System Prototype</h1>
+  <p class="subtitle">Interactive visualization of Open Map Priors, WGS84 &rarr; ENU transforms, SSAKS 3-Stage Keyframe Selection, and ADR 0003 Cruise Fallbacks.</p>
+</header>
+
+<div class="grid-container">
+  
+  <!-- LEFT PANEL: Scenario Walkthroughs & Provider Controls -->
+  <div class="panel">
+    <h2>1. Guided Scenarios</h2>
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="setScenario('happy_path')">1. Happy Path</button>
+      <button class="tab-btn" onclick="setScenario('erratic_flight')">2. Erratic (ADR 0003)</button>
+      <button class="tab-btn" onclick="setScenario('provider_outage')">3. Failover</button>
+    </div>
+
+    <div id="scenario-desc" class="scenario-box">
+      <strong>Happy Path</strong>: Stabilized cruise flight at 45m. Overture vector building footprints + Cesium terrain ingested as <code>prior_guided</code>. SSAKS achieves 90% frame reduction.
+    </div>
+
+    <h2>2. GeoPrior Providers</h2>
+    <div class="control-group">
+      <label>Target Site Bounding Box</label>
+      <select id="location-select" onchange="changeLocation(this.value)">
+        <option value="bangalore">Bangalore Urban (12.97° N, 77.59° E)</option>
+        <option value="san_francisco">San Francisco Downtown (37.77° N, -122.41° W)</option>
+        <option value="custom">Custom Site Bounding Box</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label><span>Overture Maps API</span> <span id="overture-status" class="badge badge-observed">ONLINE</span></label>
+      <button class="btn" onclick="toggleProvider('overture')">Toggle Overture Disconnect</button>
+    </div>
+
+    <div class="control-group">
+      <label><span>Cesium Terrain API</span> <span id="cesium-status" class="badge badge-observed">ONLINE</span></label>
+      <button class="btn" onclick="toggleProvider('cesium')">Toggle Cesium Disconnect</button>
+    </div>
+
+    <div class="control-group">
+      <label><span>OpenStreetMap (Fallback)</span> <span class="badge badge-prior">STANDBY</span></label>
+    </div>
+
+    <div class="log-box" id="engine-logs">
+      <div class="log-entry">[Engine] GeoPriorProviderEngine initialized.</div>
+      <div class="log-entry">[Engine] WGS84 ellipsoid datum locked.</div>
+    </div>
+  </div>
+
+  <!-- CENTER PANEL: 2D/3D Live Canvas & Flight Controller -->
+  <div class="panel" style="flex-grow: 1;">
+    <h2>
+      <span>3. Live Spatial Viewport & Provenance Shading</span>
+      <div>
+        <span class="badge badge-observed">Observed (Solid)</span>
+        <span class="badge badge-prior">Prior (Wireframe)</span>
+        <span class="badge badge-inferred">Inferred (Hatched)</span>
+      </div>
+    </h2>
+    
+    <div class="viewport-container">
+      <canvas id="sim-canvas"></canvas>
+    </div>
+
+    <div style="margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px;">
+      <button class="btn btn-primary" id="play-btn" onclick="toggleSimulation()">▶ Start Drone Flight</button>
+      <button class="btn" onclick="resetSimulation()">↺ Reset Simulation</button>
+      <button class="btn" onclick="injectFlightJitter()">⚠️ Inject Turbulence</button>
+      <button class="btn" onclick="triggerBlurGlitch()">🌫️ Inject Camera Blur</button>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL: SSAKS Cascade Telemetry & Diagnostics -->
+  <div class="panel">
+    <h2>4. SSAKS Cascade Telemetry</h2>
+
+    <div class="stat-card">
+      <div class="stat-label">Flight State & Cruise Mode</div>
+      <div class="stat-value" id="flight-state-display" style="color: var(--success);">TAKEOFF</div>
+      <div class="stat-sub" id="cruise-timer-display">Cruise Timer: 0.0s / 30.0s</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Frame Reduction Rate</div>
+      <div class="stat-value" id="reduction-display">0.0%</div>
+      <div class="stat-sub" id="frame-counts">0 / 0 frames kept</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Active Provenance Distribution</div>
+      <div class="stat-sub" id="prov-counts" style="margin-top: 4px;">
+        Observed: <strong style="color: var(--observed);">0</strong> | 
+        Prior: <strong style="color: var(--prior-guided);">4</strong> | 
+        Inferred: <strong style="color: var(--ai-inferred);">0</strong>
+      </div>
+    </div>
+
+    <h2>5. SSAKS Dynamic Thresholds</h2>
+    <div class="control-group">
+      <label>Laplacian Blur Cutoff (<span id="val-blur">65</span>)</label>
+      <input type="range" min="30" max="150" value="65" oninput="updateParam('blur', this.value)">
+    </div>
+
+    <div class="control-group">
+      <label>Visual Novelty Cutoff (<span id="val-novelty">0.88</span>)</label>
+      <input type="range" min="50" max="98" value="88" oninput="updateParam('novelty', this.value / 100)">
+    </div>
+
+    <div class="stat-card" style="margin-top: auto;">
+      <div class="stat-label">Immutable Provenance Assertion</div>
+      <div style="font-size: 0.85rem; color: #7ee787; margin-top: 4px;">
+        ✔ 100% priors tagged <code>prior_guided</code><br>
+        ✔ <code>ai_inference = False</code> invariant verified
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // --- STATE MODEL ---
+  const state = {
+    scenario: 'happy_path',
+    overtureOnline: true,
+    cesiumOnline: true,
+    osmOnline: true,
+    simRunning: false,
+    flightSec: 0.0,
+    flightState: 'TAKEOFF',
+    altitude: 10.0,
+    cruiseTimer: 0.0,
+    erraticFlight: false,
+    blurGlitch: false,
+    adr0003Triggered: false,
+    
+    // Video simulation stats
+    totalRawFrames: 0,
+    selectedKeyframes: 0,
+    
+    // Config
+    minBlur: 65,
+    noveltyCutoff: 0.88,
+    
+    // Buildings & Drone in Local ENU (meters)
+    dronePos: { x: 50, y: 30, z: 15 },
+    droneHeading: 0,
+    dronePath: [],
+    keyframes: [],
+    
+    buildings: [
+      { id: 'b1', x: 120, y: 100, w: 45, h: 55, height: 18.5, prov: 'prior_guided', observed: false },
+      { id: 'b2', x: 220, y: 90, w: 60, h: 40, height: 24.0, prov: 'prior_guided', observed: false },
+      { id: 'b3', x: 140, y: 220, w: 50, h: 50, height: 15.0, prov: 'prior_guided', observed: false },
+      { id: 'b4', x: 250, y: 200, w: 70, h: 60, height: 32.0, prov: 'prior_guided', observed: false }
+    ]
+  };
+
+  // --- CANVAS VIEWPORT RENDERING ---
+  const canvas = document.getElementById('sim-canvas');
+  const ctx = canvas.getContext('2d');
+
+  function resizeCanvas() {
+    canvas.width = canvas.parentElement.clientWidth;
+    canvas.height = canvas.parentElement.clientHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  function logEngine(msg, type='info') {
+    const box = document.getElementById('engine-logs');
+    const div = document.createElement('div');
+    div.className = 'log-entry' + (type === 'warn' ? ' log-warn' : type === 'err' ? ' log-err' : '');
+    div.textContent = `[${new Date().toISOString().substr(11, 8)}] ${msg}`;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function setScenario(name) {
+    state.scenario = name;
+    document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+      btn.classList.toggle('active', (idx === 0 && name==='happy_path') || (idx === 1 && name==='erratic_flight') || (idx === 2 && name==='provider_outage'));
+    });
+
+    const desc = document.getElementById('scenario-desc');
+    resetSimulation();
+
+    if (name === 'happy_path') {
+      desc.innerHTML = '<strong>Happy Path</strong>: Stabilized cruise flight at 45m. Overture vector building footprints + Cesium terrain ingested as <code>prior_guided</code>. SSAKS achieves 90% frame reduction.';
+      state.overtureOnline = true;
+      state.cesiumOnline = true;
+      state.erraticFlight = false;
+      logEngine("Scenario 1 loaded: Standard Stabilized Flight.");
+    } else if (name === 'erratic_flight') {
+      desc.innerHTML = '<strong>Erratic Flight (ADR 0003)</strong>: Drone experiences aggressive turbulence and hovering. 30s cruise timer triggers automatic fallback to <code>MOTION_ADAPTIVE_FALLBACK</code>.';
+      state.erraticFlight = true;
+      logEngine("Scenario 2 loaded: Turbulent/Erratic Flight Simulation.", "warn");
+    } else if (name === 'provider_outage') {
+      desc.innerHTML = '<strong>Provider Failover</strong>: Overture and Cesium offline. GeoPriorProviderEngine executes automatic fallback to <strong>OpenStreetMap</strong> and <strong>Synthetic Flat Datum</strong>.';
+      state.overtureOnline = false;
+      state.cesiumOnline = false;
+      logEngine("Scenario 3 loaded: Primary GIS Outage. Fallback engaged.", "err");
+    }
+    updateUI();
+  }
+
+  function toggleProvider(name) {
+    if (name === 'overture') {
+      state.overtureOnline = !state.overtureOnline;
+      logEngine(`Overture Maps status changed: ${state.overtureOnline ? 'ONLINE' : 'OFFLINE (Failing over to OSM)'}`, state.overtureOnline ? 'info' : 'warn');
+    } else if (name === 'cesium') {
+      state.cesiumOnline = !state.cesiumOnline;
+      logEngine(`Cesium Terrain status changed: ${state.cesiumOnline ? 'ONLINE' : 'OFFLINE (Failing over to Synthetic Flat)'}`, state.cesiumOnline ? 'info' : 'warn');
+    }
+    updateUI();
+  }
+
+  function injectFlightJitter() {
+    state.erraticFlight = !state.erraticFlight;
+    logEngine(`Flight turbulence ${state.erraticFlight ? 'INJECTED (High IMU Variance)' : 'CLEARED'}`, state.erraticFlight ? 'warn' : 'info');
+    updateUI();
+  }
+
+  function triggerBlurGlitch() {
+    state.blurGlitch = true;
+    logEngine("Camera gimbal blur glitch injected! SSAKS Stage 1 will drop frames.", "warn");
+    setTimeout(() => { state.blurGlitch = false; }, 3000);
+  }
+
+  function updateParam(name, val) {
+    if (name === 'blur') {
+      state.minBlur = parseFloat(val);
+      document.getElementById('val-blur').textContent = val;
+    } else if (name === 'novelty') {
+      state.noveltyCutoff = parseFloat(val);
+      document.getElementById('val-novelty').textContent = val;
+    }
+  }
+
+  let simTimer = null;
+  function toggleSimulation() {
+    state.simRunning = !state.simRunning;
+    document.getElementById('play-btn').textContent = state.simRunning ? '⏸ Pause Flight' : '▶ Resume Flight';
+    if (state.simRunning && !simTimer) {
+      simTimer = setInterval(stepSimulation, 66); // ~15 FPS simulation ticks
+    } else if (!state.simRunning && simTimer) {
+      clearInterval(simTimer);
+      simTimer = null;
+    }
+  }
+
+  function resetSimulation() {
+    if (simTimer) clearInterval(simTimer);
+    simTimer = null;
+    state.simRunning = false;
+    state.flightSec = 0.0;
+    state.flightState = 'TAKEOFF';
+    state.altitude = 10.0;
+    state.cruiseTimer = 0.0;
+    state.adr0003Triggered = false;
+    state.totalRawFrames = 0;
+    state.selectedKeyframes = 0;
+    state.dronePos = { x: 50, y: 30, z: 15 };
+    state.dronePath = [];
+    state.keyframes = [];
+    state.buildings.forEach(b => { b.prov = 'prior_guided'; b.observed = false; });
+    document.getElementById('play-btn').textContent = '▶ Start Drone Flight';
+    logEngine("Simulation state reset.");
+    updateUI();
+    drawScene();
+  }
+
+  function stepSimulation() {
+    state.flightSec += 0.066;
+    state.totalRawFrames += 2; // Simulate 30fps video stream
+
+    // Drone flight trajectory
+    const speed = state.erraticFlight ? 0.8 : 1.4;
+    state.droneHeading += state.erraticFlight ? (Math.random() - 0.5) * 0.4 : 0.015;
+    state.dronePos.x += Math.cos(state.droneHeading) * speed;
+    state.dronePos.y += Math.sin(state.droneHeading) * speed;
+    state.dronePath.push({ x: state.dronePos.x, y: state.dronePos.y });
+
+    // Flight state and altitude simulation
+    if (state.flightSec < 4.0) {
+      state.flightState = 'TAKEOFF';
+      state.altitude = 10.0 + state.flightSec * 8.0;
+    } else if (state.erraticFlight) {
+      state.flightState = 'ERRATIC';
+      state.altitude = 45.0 + Math.sin(state.flightSec * 3) * 12.0;
+      state.cruiseTimer += 0.066;
+      if (state.cruiseTimer >= 30.0 && !state.adr0003Triggered) {
+        state.adr0003Triggered = true;
+        logEngine("🚨 [ADR 0003 / DD-07] 30s Cruise Timeout Reached! Triggering Motion-Adaptive Fallback.", "err");
+      }
+    } else {
+      state.flightState = 'CRUISE';
+      state.altitude = 45.0 + Math.sin(state.flightSec * 0.2) * 0.4;
+      state.cruiseTimer = Math.min(30.0, state.cruiseTimer + 0.066);
+    }
+
+    // SSAKS Selection Logic
+    const simulatedBlur = state.blurGlitch ? 25.0 : (state.erraticFlight ? 55.0 + Math.random() * 20 : 110.0 + Math.random() * 30);
+    const passStage1 = simulatedBlur >= state.minBlur;
+
+    if (passStage1) {
+      const isNovel = (state.totalRawFrames % (state.erraticFlight ? 6 : 14) === 0);
+      if (isNovel || state.adr0003Triggered) {
+        state.selectedKeyframes++;
+        state.keyframes.push({ x: state.dronePos.x, y: state.dronePos.y, heading: state.droneHeading });
+        
+        // Update observed buildings if drone is within camera frustum distance
+        state.buildings.forEach(b => {
+          const dist = Math.hypot(b.x - state.dronePos.x, b.y - state.dronePos.y);
+          if (dist < 100) {
+            b.prov = 'observed';
+            b.observed = true;
+          }
+        });
+      }
+    }
+
+    updateUI();
+    drawScene();
+  }
+
+  function updateUI() {
+    // Provider badges
+    document.getElementById('overture-status').textContent = state.overtureOnline ? 'ONLINE' : 'OFFLINE';
+    document.getElementById('overture-status').className = 'badge ' + (state.overtureOnline ? 'badge-observed' : 'badge-warning');
+
+    document.getElementById('cesium-status').textContent = state.cesiumOnline ? 'ONLINE' : 'OFFLINE';
+    document.getElementById('cesium-status').className = 'badge ' + (state.cesiumOnline ? 'badge-observed' : 'badge-warning');
+
+    // Flight state
+    const stateEl = document.getElementById('flight-state-display');
+    stateEl.textContent = state.adr0003Triggered ? 'MOTION-ADAPTIVE FALLBACK (ADR 0003)' : state.flightState;
+    stateEl.style.color = state.adr0003Triggered ? 'var(--danger)' : (state.flightState === 'CRUISE' ? 'var(--success)' : 'var(--warning)');
+
+    document.getElementById('cruise-timer-display').textContent = `Elapsed: ${state.flightSec.toFixed(1)}s | Cruise Timer: ${state.cruiseTimer.toFixed(1)}s / 30.0s`;
+
+    // Reductions
+    const redPct = state.totalRawFrames > 0 ? ((1.0 - (state.selectedKeyframes / state.totalRawFrames)) * 100.0).toFixed(1) : '0.0';
+    document.getElementById('reduction-display').textContent = `${redPct}%`;
+    document.getElementById('frame-counts').textContent = `${state.selectedKeyframes} kept / ${state.totalRawFrames} video frames`;
+
+    // Provenance
+    const obsCount = state.buildings.filter(b => b.prov === 'observed').length;
+    const priorCount = state.buildings.length - obsCount;
+    document.getElementById('prov-counts').innerHTML = `
+      Observed: <strong style="color: var(--observed);">${obsCount}</strong> | 
+      Prior: <strong style="color: var(--prior-guided);">${priorCount}</strong> | 
+      Inferred: <strong style="color: var(--ai-inferred);">0</strong>
+    `;
+  }
+
+  function drawScene() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw Terrain Grid in local ENU
+    ctx.strokeStyle = state.cesiumOnline ? '#1f2937' : '#2d1515';
+    ctx.lineWidth = 1;
+    const gridSize = 40;
+    for (let x = 0; x < canvas.width; x += gridSize) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+    }
+    for (let y = 0; y < canvas.height; y += gridSize) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+    }
+
+    // Draw Buildings with WYSIWYG Provenance Shading (ADR 0004)
+    state.buildings.forEach(b => {
+      if (b.prov === 'observed') {
+        // Solid Emerald Green
+        ctx.fillStyle = 'rgba(46, 160, 67, 0.7)';
+        ctx.strokeStyle = '#3fb950';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([]);
+        ctx.fillRect(b.x, b.y, b.w, b.h);
+        ctx.strokeRect(b.x, b.y, b.w, b.h);
+      } else {
+        // Translucent Wireframe Cyan (Prior-Guided)
+        ctx.fillStyle = 'rgba(56, 139, 253, 0.15)';
+        ctx.strokeStyle = '#58a6ff';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 4]);
+        ctx.fillRect(b.x, b.y, b.w, b.h);
+        ctx.strokeRect(b.x, b.y, b.w, b.h);
+      }
+
+      // Height label
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#e6edf3';
+      ctx.font = '11px sans-serif';
+      ctx.fillText(`${b.height}m (${b.prov})`, b.x + 4, b.y + b.h / 2);
+    });
+
+    // Draw Drone Trajectory
+    if (state.dronePath.length > 1) {
+      ctx.strokeStyle = '#58a6ff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(state.dronePath[0].x, state.dronePath[0].y);
+      for (let i = 1; i < state.dronePath.length; i++) {
+        ctx.lineTo(state.dronePath[i].x, state.dronePath[i].y);
+      }
+      ctx.stroke();
+    }
+
+    // Draw Keyframe Camera Frustums
+    state.keyframes.forEach(kf => {
+      ctx.save();
+      ctx.translate(kf.x, kf.y);
+      ctx.rotate(kf.heading);
+      ctx.fillStyle = 'rgba(210, 153, 34, 0.4)';
+      ctx.strokeStyle = '#d29922';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(25, -15);
+      ctx.lineTo(25, 15);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    });
+
+    // Draw Drone Entity
+    ctx.save();
+    ctx.translate(state.dronePos.x, state.dronePos.y);
+    ctx.rotate(state.droneHeading);
+    ctx.fillStyle = '#f85149';
+    ctx.beginPath();
+    ctx.arc(0, 0, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Camera heading arrow
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.moveTo(10, 0);
+    ctx.lineTo(0, -5);
+    ctx.lineTo(0, 5);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Initial render
+  drawScene();
+  updateUI();
+</script>
+
+</body>
+</html>
