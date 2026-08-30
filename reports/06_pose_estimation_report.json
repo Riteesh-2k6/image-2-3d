@@ -1,0 +1,19 @@
+{
+  "stage": "Stage 2 (Pose Estimation)",
+  "ticket": "[08] Hybrid Pose Estimation (VGGT)",
+  "metrics": {
+    "pose_confidence_score": 0.48547570326998607,
+    "reprojection_residual_px": 2.4271868487392614,
+    "feature_track_consistency": 0.5880431872936558,
+    "camera_graph_connectivity": 0.0011028103469624293,
+    "inlier_match_ratio": 0.848218256250008,
+    "num_registered_frames": 193,
+    "total_frames": 193,
+    "registration_rate_pct": 100.0
+  },
+  "runtime_sec": 40.773,
+  "fps_throughput": 4.73,
+  "sparse_point_count": 42900,
+  "mean_reprojection_px": 2.427,
+  "engine_used": "lm_bundle_adjustment"
+}

@@ -1,0 +1,17 @@
+.git
+.github
+.agents
+videos
+output
+reports
+models
+__pycache__
+*.mp4
+*.MP4
+*.zip
+*.tar
+*.gz
+*.pkl
+*.pth
+*.pt
+.pytest_cache

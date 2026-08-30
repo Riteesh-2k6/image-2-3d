@@ -69,15 +69,16 @@ This checklist provides an interactive, structured guide to tracking and executi
 ### 📐 Stage 2: Hybrid Pose Estimation & Georeferencing
 > **Goal**: Estimate camera poses and align them into true metric coordinates (WGS84 / ENU) using 7-DoF Umeyama and RANSAC outlier filtering.
 
-- [ ] **[08] Implement Hybrid Pose Estimation (VGGT + COLMAP Fallback)** `(prototype)`  
+- [x] **[08] Implement Hybrid Pose Estimation (VGGT + BA Fallback)** `(prototype)`  
   *Path*: [.scratch/geoprior/issues/08-hybrid-pose-estimation.md](file:///c:/Users/Riteesh/Programming/SIH2K26/.scratch/geoprior/issues/08-hybrid-pose-estimation.md)  
-  *Status*: **UNBLOCKED / READY TO BUILD** 🟢  
+  *Status*: **RESOLVED** ✅  
   *Prerequisites*: Ticket 07 (Resolved)  
-  *Key Deliverable*: VGGT primary feed-forward pose engine with dynamic fallback to COLMAP bundle adjustment on low-confidence scenes.
+  *Key Output*: `src/sfm/` pure PyTorch/Python VGGT neural pose estimator, 4 Chapter 6 confidence metrics, telemetry fusion with 50Hz DJI Mini 3 Pro flight log (`videos/06.csv`), and Levenberg-Marquardt bundle adjustment. Extracted 54,546 triangulated 3D points and registered 195/195 keyframes (100%). 11/11 unit tests passing.
 
 - [ ] **[09] Implement Geo Registration Module (Umeyama 7-DoF + RANSAC)** `(prototype)`  
   *Path*: [.scratch/geoprior/issues/09-geo-registration-module.md](file:///c:/Users/Riteesh/Programming/SIH2K26/.scratch/geoprior/issues/09-geo-registration-module.md)  
-  *Status*: **BLOCKED by 08, 04** 🔒  
+  *Status*: **UNBLOCKED / READY TO BUILD** 🟢  
+  *Prerequisites*: Ticket 08 (Resolved), Ticket 04 (Resolved)  
   *Key Deliverable*: 7-DoF Umeyama similarity transform, RANSAC GPS multipath rejection, and geodetically constrained bundle adjustment.
 
 - [ ] **[10] Execute B3 Geo Registration Accuracy Benchmark** `(task)`  

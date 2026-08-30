@@ -1,0 +1,76 @@
+{
+  "dataset": "videos/06.MP4",
+  "num_train_views": 144,
+  "num_test_views": 49,
+  "iterations": 300,
+  "lambda_prior": 0.001,
+  "initial_psnr_db": 9.54,
+  "final_psnr_db": 11.24,
+  "final_ssim": 0.2428,
+  "peak_train_vram_mb": 2753.3,
+  "rendering_fps": 1.5,
+  "num_gaussians": 4402,
+  "output_ply": "output/06_splat/06_splat_scene.ply",
+  "history": [
+    {
+      "iteration": 50,
+      "psnr_db": 12.004,
+      "ssim": 0.2806,
+      "lpips": 0.0,
+      "num_gaussians": 4402,
+      "training_vram_mb": 2715.7,
+      "eval_vram_mb": 0.0,
+      "rendering_fps": 1.0
+    },
+    {
+      "iteration": 100,
+      "psnr_db": 12.034,
+      "ssim": 0.2799,
+      "lpips": 0.0,
+      "num_gaussians": 4402,
+      "training_vram_mb": 2715.7,
+      "eval_vram_mb": 0.0,
+      "rendering_fps": 1.1
+    },
+    {
+      "iteration": 150,
+      "psnr_db": 12.078,
+      "ssim": 0.2823,
+      "lpips": 0.0,
+      "num_gaussians": 4402,
+      "training_vram_mb": 2715.7,
+      "eval_vram_mb": 0.0,
+      "rendering_fps": 2.0
+    },
+    {
+      "iteration": 200,
+      "psnr_db": 12.673,
+      "ssim": 0.2987,
+      "lpips": 0.0,
+      "num_gaussians": 4402,
+      "training_vram_mb": 2753.3,
+      "eval_vram_mb": 0.0,
+      "rendering_fps": 1.8
+    },
+    {
+      "iteration": 250,
+      "psnr_db": 12.602,
+      "ssim": 0.2954,
+      "lpips": 0.0,
+      "num_gaussians": 4402,
+      "training_vram_mb": 2753.3,
+      "eval_vram_mb": 0.0,
+      "rendering_fps": 2.0
+    },
+    {
+      "iteration": 300,
+      "psnr_db": 12.645,
+      "ssim": 0.2984,
+      "lpips": 0.0,
+      "num_gaussians": 4402,
+      "training_vram_mb": 2753.3,
+      "eval_vram_mb": 0.0,
+      "rendering_fps": 0.9
+    }
+  ]
+}

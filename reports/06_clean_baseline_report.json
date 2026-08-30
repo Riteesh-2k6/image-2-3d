@@ -1,0 +1,36 @@
+{
+  "report_version": "v4_clean_canonical",
+  "dataset": "videos/06.MP4 + videos/06.csv",
+  "num_keyframes": 193,
+  "rolling_shutter_correction": "OFF (Default)",
+  "feedforward_vo_metrics": {
+    "path_length_m": 166.4433759864587,
+    "cv_5fold_mean_ate_m": 9.031373822880825,
+    "cv_5fold_std_ate_m": 2.2253702693544613,
+    "tail_holdout_median_ate_m": 12.127480737496738,
+    "tail_holdout_mean_ate_m": 11.295474004661198,
+    "global_median_ate_m": 5.348276636000845
+  },
+  "bundle_adjusted_vo_metrics": {
+    "path_length_m": 166.04645210939714,
+    "cv_5fold_mean_ate_m": 9.039551301673118,
+    "cv_5fold_std_ate_m": 2.2002215030287275,
+    "tail_holdout_median_ate_m": 12.061569659400078,
+    "tail_holdout_mean_ate_m": 11.285343658862036,
+    "global_median_ate_m": 5.373824693104375
+  },
+  "heading_geometric_drift": {
+    "train_mean_error_deg": 31.43803886442909,
+    "tail_mean_error_deg": 59.919979402407385,
+    "full_flight_mean_error_deg": 39.99737850796661,
+    "drift_rate_deg_per_sec": 0.6998894460341661
+  },
+  "reprojection_percentiles_px": {
+    "mean": 4.3050969095668234,
+    "median": 2.826783335949757,
+    "rms": 9.383532092447137,
+    "p90": 6.653245261907487,
+    "p95": 9.74535157554952,
+    "p99": 35.781999009849
+  }
+}

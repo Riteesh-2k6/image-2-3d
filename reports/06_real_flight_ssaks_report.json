@@ -12,7 +12,7 @@
     "frame_reduction_pct": 89.93,
     "stage1_blur_flow_drops": 53,
     "stage2_novelty_drops": 1670,
-    "processing_time_seconds": 52.79,
-    "throughput_fps": 36.29
+    "processing_time_seconds": 114.39,
+    "throughput_fps": 16.75
   }
 }

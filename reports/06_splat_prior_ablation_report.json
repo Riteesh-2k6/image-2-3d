@@ -1,0 +1,44 @@
+{
+  "lambda_prior_sweep": [
+    {
+      "lambda_prior": 0.0,
+      "initial_psnr_db": 9.08,
+      "final_psnr_db": 10.23,
+      "final_ssim": 0.1966,
+      "num_gaussians": 2402,
+      "peak_vram_mb": 1696.7
+    },
+    {
+      "lambda_prior": 0.001,
+      "initial_psnr_db": 10.45,
+      "final_psnr_db": 10.9,
+      "final_ssim": 0.2259,
+      "num_gaussians": 4402,
+      "peak_vram_mb": 1763.8
+    },
+    {
+      "lambda_prior": 0.005,
+      "initial_psnr_db": 10.07,
+      "final_psnr_db": 10.63,
+      "final_ssim": 0.2228,
+      "num_gaussians": 4402,
+      "peak_vram_mb": 1794.8
+    },
+    {
+      "lambda_prior": 0.01,
+      "initial_psnr_db": 10.37,
+      "final_psnr_db": 10.87,
+      "final_ssim": 0.2294,
+      "num_gaussians": 4402,
+      "peak_vram_mb": 1794.8
+    },
+    {
+      "lambda_prior": 0.05,
+      "initial_psnr_db": 10.01,
+      "final_psnr_db": 10.66,
+      "final_ssim": 0.2151,
+      "num_gaussians": 4402,
+      "peak_vram_mb": 1794.8
+    }
+  ]
+}

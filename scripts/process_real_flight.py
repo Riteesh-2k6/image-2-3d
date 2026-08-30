@@ -28,6 +28,7 @@ import csv
 import time
 import json
 import numpy as np
+import glob
 from typing import List, Dict, Any, Optional
 
 from src.ssaks.types import FrameTelemetry, SSAKSConfig
@@ -110,6 +111,12 @@ def process_real_flight():
     cascade = SSAKSCascade(config)
 
     os.makedirs(OUTPUT_KEYFRAMES_DIR, exist_ok=True)
+    # Clear any stale keyframe files from previous runs
+    for old_f in glob.glob(os.path.join(OUTPUT_KEYFRAMES_DIR, "*.jpg")):
+        try:
+            os.remove(old_f)
+        except Exception:
+            pass
 
     t0_start = time.perf_counter()
     frame_idx = 0

@@ -16,6 +16,9 @@ videos/*.h264
 videos/*.avi
 videos/*.mov
 output/06_keyframes/
+output/06_splat_ablation_*/
+output/test_*/
+output/diagnostics/
 output/*.mp4
 output/*.avi
 
